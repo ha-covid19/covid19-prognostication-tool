@@ -1,0 +1,1280 @@
+Sub covid_calculator_day5()
+    
+    Sheet2.Range("I4:M4").ClearContents
+    Sheet2.Range("I4:M4").Interior.ColorIndex = 2
+  
+
+    Dim inputVector(6), score() As Double
+    Dim class0Rng, class1Rng, class2Rng As Range
+    Dim age, worstCondition, ldh As Range
+    Dim refUpper, ldhRatio, platelet, albumin As Range
+    Dim globulin, agRatio, crp, neutrophil, lymphocyte, nlRatio As Range
+    Dim a, c As String
+    Dim b, d, e, f, g, h, i, j, k, l, m As Double
+    
+    With Worksheets("Sheet1")
+        Set class0Rng = .Range("I4")
+        Set class1Rng = .Range("J4")
+        Set class2Rng = .Range("L4")
+        Set age = .Range("I7")
+        Set worstCondition = .Range("I8")
+        Set ldh = .Range("I9")
+        Set refUpper = .Range("I10")
+        Set ldhRatio = .Range("M9")
+        Set platelet = .Range("I11")
+        Set albumin = .Range("I12")
+        Set globulin = .Range("I13")
+        Set agRatio = .Range("M12")
+        Set crp = .Range("I14")
+        Set neutrophil = .Range("I15")
+        Set lymphocyte = .Range("I16")
+        Set nlRatio = .Range("M15")
+    End With
+
+    
+    a = age.Value 'age_group
+    c = worstCondition.Value 'worst_condition
+    d = ldh.Value 'LDH
+    e = refUpper.Value 'ref_upper
+    b = ldhRatio.MergeArea.Cells(1, 1).Value 'LDH / ref_upper ratio
+    f = platelet.Value 'platelet
+    g = albumin.Value 'albumin
+    h = globulin.Value 'globulin
+    i = agRatio.MergeArea.Cells(1, 1).Value 'A/G ratio
+    j = crp.Value 'CRP
+    k = neutrophil.Value 'neutrophil
+    l = lymphocyte.Value 'lymphocyte
+    m = nlRatio.MergeArea.Cells(1, 1).Value 'N/L ratio
+    
+    'age_group
+    If a = "0 - 9" Then
+       inputVector(5) = 1
+    ElseIf a = "10 - 19" Then
+       inputVector(5) = 2
+    ElseIf a = "20 - 29" Then
+       inputVector(5) = 3
+    ElseIf a = "30 - 39" Then
+       inputVector(5) = 4
+    ElseIf a = "40 - 49" Then
+       inputVector(5) = 5
+    ElseIf a = "50 - 59" Then
+       inputVector(5) = 6
+    ElseIf a = "60 - 69" Then
+       inputVector(5) = 7
+    ElseIf a = "70 - 79" Then
+       inputVector(5) = 8
+    ElseIf a = "80 - 89" Then
+       inputVector(5) = 9
+    ElseIf a = "90 +" Then
+       inputVector(5) = 10
+    Else
+       inputVector(5) = ""
+    End If
+       
+    'dyspnea
+    'If b = "No" Then
+    '   input_vector(1) = 1
+    'ElseIf b = "Yes" Then
+    '   input_vector(1) = 2
+    'Else
+    '   input_vector(1) = " "
+    'End If
+    
+    'worst_condition
+    If c = "Critical" Then
+       inputVector(6) = 4
+    ElseIf c = "Serious" Then
+       inputVector(6) = 3
+    ElseIf c = "Stable" Then
+       inputVector(6) = 2
+    ElseIf c = "Satisfactory" Then
+       inputVector(6) = 1
+    Else
+       inputVector(6) = 0
+    End If
+    
+    'LDH
+    If ldh = "" And refUpper = "" And ldhRatio = "" Then
+       inputVector(3) = ""
+    ElseIf ldh <> "" And refUpper = "" And ldhRatio = "" Then
+       MsgBox "Please input LDH - Upper Reference"
+    ElseIf ldh <> "" And refUpper <> "" And ldhRatio = "" Then
+       inputVector(3) = d / e
+    ElseIf ldh = "" And refUpper = "" And ldhRatio <> "" Then
+       inputVector(3) = b
+    ElseIf ldh = "" And refUpper <> "" And ldhRatio <> "" Then
+       inputVector(3) = b
+    ElseIf ldh <> "" And refUpper = "" And ldhRatio <> "" Then
+       MsgBox "Please fill in either 1) LDH & LDH - Upper Reference OR 2) Ratio (LDH / LDH - Upper Reference)"
+    ElseIf ldh <> "" And refUpper <> "" And ldhRatio <> "" Then
+       MsgBox "Please fill in either 1) LDH & LDH - Upper Reference OR 2) Ratio (LDH / LDH - Upper Reference)"
+    Else
+       inputVector(3) = ""
+    End If
+
+    'Platelet
+    If f = "" Then
+       inputVector(4) = ""
+    Else
+       inputVector(4) = f
+    End If
+    
+    'Albumin & Globulin
+    If albumin = "" And globulin = "" And agRatio = "" Then
+       inputVector(0) = ""
+    ElseIf albumin <> "" And globulin <> "" And agRatio = "" Then
+       inputVector(0) = g / h
+    ElseIf albumin = "" And globulin = "" And agRatio <> "" Then
+       inputVector(0) = i
+    Else
+       MsgBox "Please fill in either 1) Albumin & Globulin OR 2) Ratio (Albumin / Globulin)"
+    End If
+    
+    'CRP
+    If crp = "" Then
+       inputVector(2) = ""
+    Else
+       inputVector(2) = j
+    End If
+        
+    'Neutrophil & Lymphocyte
+    If neutrophil = "" And lymphocyte = "" And nlRatio = "" Then
+       inputVector(1) = ""
+    ElseIf neutrophil <> "" And lymphocyte <> "" And nlRatio = "" Then
+       inputVector(1) = k / l
+    ElseIf neutrophil = "" And lymphocyte = "" And nlRatio <> "" Then
+       inputVector(1) = m
+    Else
+       MsgBox "Please fill in either 1) Neutrophil & Lymphocyte OR 2) Ratio (Neutrophil / Lymphocyte)"
+    End If
+    
+    
+    'Python_to_VBA Codes
+    '
+    '
+    Dim var0 As Double
+    If (inputVector(6)) >= (3#) Then
+        var0 = 0.149876565
+    Else
+        If (inputVector(3)) >= (0.8982607) Then
+            If (inputVector(5)) >= (5#) Then
+                If (inputVector(1)) < (2.7669683) Then
+                    var0 = -0.00979988743
+                Else
+                    var0 = 0.111388363
+                End If
+            Else
+                var0 = -0.0737194493
+            End If
+        Else
+            var0 = -0.0747830868
+        End If
+    End If
+    Dim var1 As Double
+    If (inputVector(2)) >= (15.08) Then
+        If (inputVector(3)) >= (0.878914) Then
+            If (inputVector(1)) < (2.8419018) Then
+                If (inputVector(5)) >= (8#) Then
+                    var1 = 0.120300367
+                Else
+                    var1 = -0.0702055395
+                End If
+            Else
+                If (inputVector(1)) < (5.828431) Then
+                    var1 = 0.117010072
+                Else
+                    var1 = 0.129370913
+                End If
+            End If
+        Else
+            If (inputVector(3)) < (0.6588882) Then
+                If (inputVector(3)) < (0.655102) Then
+                    var1 = -0.042928163
+                Else
+                    var1 = 0.14643085
+                End If
+            Else
+                var1 = -0.0667065009
+            End If
+        End If
+    Else
+        If (inputVector(3)) >= (0.89724493) Then
+            If (inputVector(0)) >= (0.8683299) Then
+                var1 = -0.0726161674
+            Else
+                If (inputVector(2)) < (2.915) Then
+                    var1 = -0.0663376674
+                Else
+                    var1 = 0.114827231
+                End If
+            End If
+        Else
+            var1 = -0.0721452162
+        End If
+    End If
+    Dim var2 As Double
+    If (inputVector(3)) >= (0.878914) Then
+        If (inputVector(6)) >= (2#) Then
+            If (inputVector(0)) >= (1.1730769) Then
+                If (inputVector(4)) < (0.33701116) Then
+                    var2 = 0.117169857
+                Else
+                    var2 = -0.0659353361
+                End If
+            Else
+                If (inputVector(6)) >= (3#) Then
+                    var2 = 0.116397358
+                Else
+                    var2 = 0.0845921859
+                End If
+            End If
+        Else
+            If (inputVector(3)) < (1.0282543) Then
+                var2 = -0.0706291646
+            Else
+                If (inputVector(4)) < (0.68995535) Then
+                    var2 = 0.0807847008
+                Else
+                    var2 = -0.0721436664
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(0)) < (1.1106632) Then
+            If (inputVector(0)) < (1.1094553) Then
+                var2 = -0.0689980909
+            Else
+                var2 = 0.127692983
+            End If
+        Else
+            var2 = -0.0696363822
+        End If
+    End If
+    Dim var3 As Double
+    If (inputVector(3)) >= (0.9381751) Then
+        If (inputVector(2)) < (3.125) Then
+            var3 = -0.0664954409
+        Else
+            If (inputVector(2)) < (15.08) Then
+                If (inputVector(4)) < (0.68205494) Then
+                    var3 = -0.0689636916
+                Else
+                    var3 = 0.0842120573
+                End If
+            Else
+                If (inputVector(6)) >= (2#) Then
+                    var3 = 0.103139579
+                Else
+                    var3 = 0.0629641637
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(2)) >= (41.9) Then
+            If (inputVector(4)) < (0.69336224) Then
+                var3 = -0.0507763997
+            Else
+                If (inputVector(2)) < (129.13) Then
+                    var3 = 0.109139182
+                Else
+                    var3 = 0
+                End If
+            End If
+        Else
+            If (inputVector(4)) >= (0.94559205) Then
+                If (inputVector(4)) < (0.9472973) Then
+                    var3 = 0.119336002
+                Else
+                    var3 = -0.0648524761
+                End If
+            Else
+                var3 = -0.0676525235
+            End If
+        End If
+    End If
+    Dim var4 As Double
+    If (inputVector(3)) >= (0.8982607) Then
+        If (inputVector(6)) >= (2#) Then
+            If (inputVector(2)) < (3#) Then
+                var4 = -0.058429338
+            Else
+                If (inputVector(1)) < (1.57413) Then
+                    var4 = -0.0588223338
+                Else
+                    var4 = 0.0930743888
+                End If
+            End If
+        Else
+            If (inputVector(2)) >= (5.7349997) Then
+                If (inputVector(1)) < (5.6254625) Then
+                    var4 = -0.0127976788
+                Else
+                    var4 = 0.0833859518
+                End If
+            Else
+                var4 = -0.066311352
+            End If
+        End If
+    Else
+        If (inputVector(2)) >= (41.9) Then
+            If (inputVector(2)) < (43.55) Then
+                var4 = 0.113333099
+            Else
+                var4 = -0.0508104265
+            End If
+        Else
+            var4 = -0.0657584369
+        End If
+    End If
+    Dim var5 As Double
+    If (inputVector(3)) >= (0.9381751) Then
+        If (inputVector(2)) < (5.835) Then
+            If (inputVector(6)) >= (3#) Then
+                var5 = 0.0979778692
+            Else
+                var5 = -0.0648993403
+            End If
+        Else
+            If (inputVector(6)) >= (3#) Then
+                var5 = 0.0898827165
+            Else
+                If (inputVector(4)) < (0.6828125) Then
+                    var5 = 0.0720693693
+                Else
+                    var5 = -0.0743586943
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(2)) >= (41.9) Then
+            If (inputVector(2)) < (43.55) Then
+                var5 = 0.107581258
+            Else
+                var5 = -0.0514333546
+            End If
+        Else
+            var5 = -0.064329356
+        End If
+    End If
+    Dim var6 As Double
+    If (inputVector(2)) >= (15.065001) Then
+        If (inputVector(1)) < (1.6015173) Then
+            var6 = -0.0548397675
+        Else
+            If (inputVector(6)) >= (3#) Then
+                var6 = 0.0846554488
+            Else
+                If (inputVector(5)) >= (5#) Then
+                    var6 = 0.0653956681
+                Else
+                    var6 = -0.0595225282
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(6)) >= (3#) Then
+            var6 = 0.0927049667
+        Else
+            If (inputVector(4)) >= (0.94559205) Then
+                If (inputVector(5)) >= (7#) Then
+                    var6 = 0.0758598074
+                Else
+                    var6 = -0.0615052767
+                End If
+            Else
+                var6 = -0.063392438
+            End If
+        End If
+    End If
+    Dim var7 As Double
+    If (inputVector(6)) >= (3#) Then
+        var7 = 0.0800694004
+    Else
+        If (inputVector(2)) >= (15.08) Then
+            If (inputVector(0)) >= (1.2002225) Then
+                var7 = -0.0696657673
+            Else
+                If (inputVector(0)) < (1.108299) Then
+                    var7 = 0.0223548897
+                Else
+                    var7 = 0.0761647969
+                End If
+            End If
+        Else
+            If (inputVector(0)) >= (0.8539126) Then
+                var7 = -0.0621257313
+            Else
+                If (inputVector(5)) >= (6#) Then
+                    var7 = 0.0743766055
+                Else
+                    var7 = -0.0606152974
+                End If
+            End If
+        End If
+    End If
+    Dim var8 As Double
+    If (inputVector(2)) >= (15.08) Then
+        If (inputVector(1)) < (1.6015173) Then
+            var8 = -0.0488957576
+        Else
+            If (inputVector(3)) >= (0.655102) Then
+                If (inputVector(2)) < (42.33) Then
+                    var8 = 0.0578974895
+                Else
+                    var8 = 0.0735028014
+                End If
+            Else
+                var8 = -0.0230026245
+            End If
+        End If
+    Else
+        If (inputVector(3)) >= (0.8982607) Then
+            If (inputVector(0)) >= (0.8718264) Then
+                If (inputVector(1)) < (3.55625) Then
+                    var8 = -0.061685212
+                Else
+                    var8 = 0.051124353
+                End If
+            Else
+                If (inputVector(2)) < (2.915) Then
+                    var8 = -0.0520019233
+                Else
+                    var8 = 0.0734321401
+                End If
+            End If
+        Else
+            var8 = -0.0601131693
+        End If
+    End If
+    Dim var9 As Double
+    If (inputVector(3)) >= (0.878914) Then
+        If (inputVector(2)) < (3#) Then
+            var9 = -0.0584100559
+        Else
+            If (inputVector(0)) >= (1.1939964) Then
+                If (inputVector(5)) >= (8#) Then
+                    var9 = 0.0750033855
+                Else
+                    var9 = -0.0646102279
+                End If
+            Else
+                If (inputVector(1)) < (4.653205) Then
+                    var9 = 0.0536341183
+                Else
+                    var9 = 0.0711507574
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(2)) >= (41.9) Then
+            If (inputVector(3)) < (0.6978375) Then
+                If (inputVector(0)) < (1.1893258) Then
+                    var9 = 0.0859292969
+                Else
+                    var9 = 0
+                End If
+            Else
+                var9 = -0.028230641
+            End If
+        Else
+            var9 = -0.0591657162
+        End If
+    End If
+    Dim var10 As Double
+    var10 = Math.Exp(((((((((((0.5) + (var0)) + (var1)) + (var2)) + (var3)) + (var4)) + (var5)) + (var6)) + (var7)) + (var8)) + (var9))
+    Dim var11 As Double
+    If (inputVector(3)) >= (0.8574705) Then
+        If (inputVector(2)) < (18.25) Then
+            If (inputVector(6)) >= (2#) Then
+                If (inputVector(4)) < (0.7653435) Then
+                    var11 = 0.146829113
+                Else
+                    var11 = -0.0415660925
+                End If
+            Else
+                If (inputVector(3)) < (1.8183674) Then
+                    var11 = -0.0742734969
+                Else
+                    var11 = 0
+                End If
+            End If
+        Else
+            If (inputVector(6)) >= (3#) Then
+                var11 = -0.0748666674
+            Else
+                If (inputVector(3)) < (0.9749886) Then
+                    var11 = 0.00832639076
+                Else
+                    var11 = -0.0648971274
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(6)) >= (2#) Then
+            var11 = 0.14928861
+        Else
+            If (inputVector(6)) >= (1#) Then
+                var11 = -0.0733719021
+            Else
+                var11 = 0
+            End If
+        End If
+    End If
+    Dim var12 As Double
+    If (inputVector(2)) >= (15.08) Then
+        If (inputVector(6)) >= (3#) Then
+            var12 = -0.0718961135
+        Else
+            If (inputVector(5)) >= (5#) Then
+                If (inputVector(6)) >= (2#) Then
+                    var12 = -0.0443530157
+                Else
+                    var12 = -0.0705102235
+                End If
+            Else
+                If (inputVector(6)) >= (2#) Then
+                    var12 = 0.125575528
+                Else
+                    var12 = -0.0562798642
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(6)) >= (2#) Then
+            If (inputVector(0)) < (0.86687183) Then
+                If (inputVector(6)) >= (3#) Then
+                    var12 = -0.0708309934
+                Else
+                    var12 = 0.117552772
+                End If
+            Else
+                If (inputVector(6)) >= (3#) Then
+                    var12 = -0.0682100281
+                Else
+                    var12 = 0.137148842
+                End If
+            End If
+        Else
+            var12 = -0.0715669543
+        End If
+    End If
+    Dim var13 As Double
+    If (inputVector(3)) >= (0.8630109) Then
+        If (inputVector(6)) >= (3#) Then
+            var13 = -0.0698445365
+        Else
+            If (inputVector(6)) >= (2#) Then
+                If (inputVector(2)) >= (14.690001) Then
+                    var13 = -0.0416991115
+                Else
+                    var13 = 0.123199023
+                End If
+            Else
+                If (inputVector(3)) < (1.8487527) Then
+                    var13 = -0.0695682988
+                Else
+                    var13 = 0
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(6)) >= (2#) Then
+            var13 = 0.119642042
+        Else
+            If (inputVector(1)) >= (5.004504) Then
+                If (inputVector(3)) < (0.76094615) Then
+                    var13 = -0.0105805025
+                Else
+                    var13 = 0.0410999171
+                End If
+            Else
+                var13 = -0.0687983856
+            End If
+        End If
+    End If
+    Dim var14 As Double
+    If (inputVector(6)) >= (3#) Then
+        var14 = -0.0675425455
+    Else
+        If (inputVector(6)) >= (2#) Then
+            If (inputVector(2)) >= (23.15) Then
+                If (inputVector(4)) < (0.5337838) Then
+                    var14 = -0.0560030006
+                Else
+                    var14 = 0.144120976
+                End If
+            Else
+                If (inputVector(4)) >= (0.94559205) Then
+                    var14 = -0.0098462943
+                Else
+                    var14 = 0.109548107
+                End If
+            End If
+        Else
+            If (inputVector(6)) >= (1#) Then
+                If (inputVector(5)) >= (10#) Then
+                    var14 = 0
+                Else
+                    var14 = -0.0670114085
+                End If
+            Else
+                var14 = 0
+            End If
+        End If
+    End If
+    Dim var15 As Double
+    If (inputVector(3)) >= (0.8630109) Then
+        If (inputVector(2)) < (15.08) Then
+            If (inputVector(0)) >= (0.89466393) Then
+                If (inputVector(3)) < (0.9340136) Then
+                    var15 = -0.0227851998
+                Else
+                    var15 = 0.0245628152
+                End If
+            Else
+                If (inputVector(4)) < (0.600929) Then
+                    var15 = -0.00809804816
+                Else
+                    var15 = -0.0642896816
+                End If
+            End If
+        Else
+            If (inputVector(1)) < (1.5961539) Then
+                If (inputVector(2)) >= (22.735) Then
+                    var15 = 0.045191776
+                Else
+                    var15 = 0
+                End If
+            Else
+                If (inputVector(3)) < (0.878914) Then
+                    var15 = 0.0101837097
+                Else
+                    var15 = -0.0617044754
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(0)) >= (1.1820945) Then
+            If (inputVector(2)) < (3.78) Then
+                If (inputVector(2)) < (2.725) Then
+                    var15 = 0.00891954452
+                Else
+                    var15 = -0.0178984422
+                End If
+            Else
+                If (inputVector(2)) >= (8.29) Then
+                    var15 = 0.0552615821
+                Else
+                    var15 = 0.0196384098
+                End If
+            End If
+        Else
+            If (inputVector(0)) < (1.0256892) Then
+                If (inputVector(3)) >= (0.7279442) Then
+                    var15 = -0.00873330142
+                Else
+                    var15 = 0.0388432965
+                End If
+            Else
+                If (inputVector(2)) >= (4.01) Then
+                    var15 = -0.048973199
+                Else
+                    var15 = -0.0133671975
+                End If
+            End If
+        End If
+    End If
+    Dim var16 As Double
+    If (inputVector(3)) >= (0.8630109) Then
+        If (inputVector(2)) < (14.9) Then
+            If (inputVector(5)) >= (5#) Then
+                If (inputVector(2)) < (10.59) Then
+                    var16 = -0.0446150862
+                Else
+                    var16 = 0.0313875638
+                End If
+            Else
+                If (inputVector(3)) < (0.9680358) Then
+                    var16 = -0.0229646545
+                Else
+                    var16 = 0.0225643218
+                End If
+            End If
+        Else
+            If (inputVector(3)) < (0.878914) Then
+                var16 = 0.00635667518
+            Else
+                If (inputVector(1)) < (1.5285096) Then
+                    var16 = 0.0240857583
+                Else
+                    var16 = -0.0600063391
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(6)) >= (2#) Then
+            var16 = 0.094954811
+        Else
+            If (inputVector(2)) >= (70.7) Then
+                var16 = 0
+            Else
+                var16 = -0.0633561835
+            End If
+        End If
+    End If
+    Dim var17 As Double
+    If (inputVector(6)) >= (3#) Then
+        var17 = -0.0629074201
+    Else
+        If (inputVector(6)) >= (2#) Then
+            If (inputVector(5)) >= (7#) Then
+                If (inputVector(2)) < (55.2) Then
+                    var17 = -0.0312584229
+                Else
+                    var17 = 0.148367703
+                End If
+            Else
+                If (inputVector(2)) >= (45.25) Then
+                    var17 = -0.0128264343
+                Else
+                    var17 = 0.0933465213
+                End If
+            End If
+        Else
+            If (inputVector(2)) >= (119.5) Then
+                var17 = 0
+            Else
+                var17 = -0.0628710762
+            End If
+        End If
+    End If
+    Dim var18 As Double
+    If (inputVector(6)) >= (3#) Then
+        var18 = -0.0613458529
+    Else
+        If (inputVector(1)) >= (5.55) Then
+            If (inputVector(3)) < (0.9110769) Then
+                If (inputVector(6)) >= (2#) Then
+                    var18 = 0.0660054833
+                Else
+                    var18 = 0
+                End If
+            Else
+                If (inputVector(2)) < (124.335) Then
+                    var18 = -0.0587757602
+                Else
+                    var18 = 0.0403355062
+                End If
+            End If
+        Else
+            If (inputVector(6)) >= (2#) Then
+                If (inputVector(0)) >= (0.8539126) Then
+                    var18 = 0.0767000616
+                Else
+                    var18 = 0.00274628657
+                End If
+            Else
+                If (inputVector(3)) >= (1.8270898) Then
+                    var18 = 0
+                Else
+                    var18 = -0.0610556081
+                End If
+            End If
+        End If
+    End If
+    Dim var19 As Double
+    If (inputVector(6)) >= (3#) Then
+        var19 = -0.0603402071
+    Else
+        If (inputVector(6)) >= (2#) Then
+            If (inputVector(3)) >= (1.3842279) Then
+                If (inputVector(4)) < (0.5706855) Then
+                    var19 = -0.0527119599
+                Else
+                    var19 = 0.130699664
+                End If
+            Else
+                var19 = 0.0863546133
+            End If
+        Else
+            If (inputVector(3)) >= (1.8487527) Then
+                var19 = 0
+            Else
+                If (inputVector(5)) >= (10#) Then
+                    var19 = 0
+                Else
+                    var19 = -0.0598370694
+                End If
+            End If
+        End If
+    End If
+    Dim var20 As Double
+    If (inputVector(6)) >= (3#) Then
+        var20 = -0.0593008287
+    Else
+        If (inputVector(1)) >= (6.4038463) Then
+            If (inputVector(0)) < (1.1592742) Then
+                If (inputVector(4)) < (0.5790201) Then
+                    var20 = 0.123890758
+                Else
+                    var20 = 0
+                End If
+            Else
+                If (inputVector(1)) < (13.333334) Then
+                    var20 = -0.0612265728
+                Else
+                    var20 = 0
+                End If
+            End If
+        Else
+            If (inputVector(2)) >= (52.45) Then
+                If (inputVector(4)) < (0.5391414) Then
+                    var20 = 0
+                Else
+                    var20 = 0.125417277
+                End If
+            Else
+                If (inputVector(0)) >= (1.1510004) Then
+                    var20 = 0.00412668521
+                Else
+                    var20 = -0.020568518
+                End If
+            End If
+        End If
+    End If
+    Dim var21 As Double
+    var21 = Math.Exp(((((((((((0.5) + (var11)) + (var12)) + (var13)) + (var14)) + (var15)) + (var16)) + (var17)) + (var18)) + (var19)) + (var20))
+    Dim var22 As Double
+    If (inputVector(2)) >= (15.014999) Then
+        If (inputVector(1)) < (2.525432) Then
+            If (inputVector(5)) >= (8#) Then
+                var22 = -0.0705571175
+            Else
+                If (inputVector(3)) < (0.65684736) Then
+                    var22 = -0.0186451245
+                Else
+                    var22 = 0.0874635577
+                End If
+            End If
+        Else
+            If (inputVector(1)) < (4.836174) Then
+                If (inputVector(5)) >= (5#) Then
+                    var22 = -0.0561263263
+                Else
+                    var22 = 0.0898652002
+                End If
+            Else
+                If (inputVector(3)) < (0.7666497) Then
+                    var22 = 0.0370828137
+                Else
+                    var22 = -0.0715287328
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(3)) >= (1.2191617) Then
+            If (inputVector(1)) >= (2.0714285) Then
+                If (inputVector(2)) >= (11.825) Then
+                    var22 = 0.0932256058
+                Else
+                    var22 = -0.0680029318
+                End If
+            Else
+                If (inputVector(2)) < (12.855) Then
+                    var22 = 0.0832639486
+                Else
+                    var22 = -2.21853536E-09
+                End If
+            End If
+        Else
+            If (inputVector(4)) >= (0.69776785) Then
+                If (inputVector(2)) >= (3#) Then
+                    var22 = 0.000654951495
+                Else
+                    var22 = 0.0741604865
+                End If
+            Else
+                If (inputVector(2)) >= (6.8575) Then
+                    var22 = 0.0322589986
+                Else
+                    var22 = 0.0888719261
+                End If
+            End If
+        End If
+    End If
+    Dim var23 As Double
+    If (inputVector(6)) >= (2#) Then
+        var23 = -0.0731699392
+    Else
+        If (inputVector(2)) >= (25.84) Then
+            If (inputVector(4)) < (0.72492784) Then
+                If (inputVector(1)) < (2.6426058) Then
+                    var23 = 0.12710546
+                Else
+                    var23 = -0.0539577007
+                End If
+            Else
+                var23 = 0.143083468
+            End If
+        Else
+            If (inputVector(1)) < (1.0435185) Then
+                If (inputVector(1)) < (1.0341434) Then
+                    var23 = 0.134688362
+                Else
+                    var23 = -0.0741245896
+                End If
+            Else
+                If (inputVector(3)) >= (1.777448) Then
+                    var23 = 0
+                Else
+                    var23 = 0.135525808
+                End If
+            End If
+        End If
+    End If
+    Dim var24 As Double
+    If (inputVector(6)) >= (2#) Then
+        var24 = -0.070603542
+    Else
+        If (inputVector(1)) >= (5.6254625) Then
+            If (inputVector(4)) < (0.7048185) Then
+                If (inputVector(5)) >= (5#) Then
+                    var24 = -0.0670476854
+                Else
+                    var24 = 0.0957332477
+                End If
+            Else
+                var24 = 0.123430513
+            End If
+        Else
+            If (inputVector(5)) >= (10#) Then
+                var24 = 0
+            Else
+                var24 = 0.120727018
+            End If
+        End If
+    End If
+    Dim var25 As Double
+    If (inputVector(6)) >= (2#) Then
+        var25 = -0.0683653727
+    Else
+        If (inputVector(1)) >= (5.6254625) Then
+            If (inputVector(4)) < (0.6783784) Then
+                If (inputVector(5)) >= (5#) Then
+                    var25 = -0.063970305
+                Else
+                    var25 = 0.0873089507
+                End If
+            Else
+                var25 = 0.106927648
+            End If
+        Else
+            If (inputVector(4)) < (0.27382812) Then
+                If (inputVector(4)) < (0.13296147) Then
+                    var25 = 0.00655516097
+                Else
+                    var25 = -0.0685634911
+                End If
+            Else
+                If (inputVector(4)) >= (0.681928) Then
+                    var25 = 0.0672366321
+                Else
+                    var25 = 0.108617485
+                End If
+            End If
+        End If
+    End If
+    Dim var26 As Double
+    If (inputVector(6)) >= (2#) Then
+        var26 = -0.0663399398
+    Else
+        If (inputVector(1)) >= (5.5619707) Then
+            If (inputVector(3)) < (1.0894425) Then
+                var26 = 0.0972868502
+            Else
+                If (inputVector(4)) < (0.7048185) Then
+                    var26 = -0.0660975203
+                Else
+                    var26 = 0.0989562869
+                End If
+            End If
+        Else
+            If (inputVector(5)) >= (8#) Then
+                If (inputVector(4)) < (0.35611978) Then
+                    var26 = -0.0665221885
+                Else
+                    var26 = 0.109770812
+                End If
+            Else
+                If (inputVector(3)) < (0.6575188) Then
+                    var26 = 0.071123831
+                Else
+                    var26 = 0.100750856
+                End If
+            End If
+        End If
+    End If
+    Dim var27 As Double
+    If (inputVector(6)) >= (2#) Then
+        var27 = -0.0648720488
+    Else
+        If (inputVector(2)) >= (25.84) Then
+            If (inputVector(2)) < (42.5) Then
+                If (inputVector(2)) < (27.09) Then
+                    var27 = -0.0602756627
+                Else
+                    var27 = 0.113312505
+                End If
+            Else
+                If (inputVector(4)) < (0.737677) Then
+                    var27 = -0.0450270995
+                Else
+                    var27 = 0.0927439556
+                End If
+            End If
+        Else
+            If (inputVector(3)) >= (1.0282543) Then
+                If (inputVector(3)) < (1.0309125) Then
+                    var27 = -0.0727540553
+                Else
+                    var27 = 0.0977915078
+                End If
+            Else
+                var27 = 0.0929267928
+            End If
+        End If
+    End If
+    Dim var28 As Double
+    If (inputVector(6)) >= (2#) Then
+        var28 = -0.0633638427
+    Else
+        If (inputVector(3)) >= (1.0282543) Then
+            If (inputVector(4)) < (0.68995535) Then
+                If (inputVector(1)) < (3.025) Then
+                    var28 = 0.0209118631
+                Else
+                    var28 = -0.0510007329
+                End If
+            Else
+                var28 = 0.0948096439
+            End If
+        Else
+            var28 = 0.0866944343
+        End If
+    End If
+    Dim var29 As Double
+    If (inputVector(3)) >= (0.9869968) Then
+        If (inputVector(6)) >= (2#) Then
+            var29 = -0.0614589639
+        Else
+            If (inputVector(0)) >= (0.7196429) Then
+                If (inputVector(1)) < (9.740477) Then
+                    var29 = 0.0941751525
+                Else
+                    var29 = -0.0480452031
+                End If
+            Else
+                If (inputVector(5)) >= (7#) Then
+                    var29 = 0.0946546942
+                Else
+                    var29 = -0.043734774
+                End If
+            End If
+        End If
+    Else
+        If (inputVector(6)) >= (2#) Then
+            var29 = -0.0633042827
+        Else
+            If (inputVector(1)) >= (2.6967154) Then
+                If (inputVector(1)) < (2.7036586) Then
+                    var29 = -0.0701751933
+                Else
+                    var29 = 0.0795797482
+                End If
+            Else
+                var29 = 0.0816316679
+            End If
+        End If
+    End If
+    Dim var30 As Double
+    If (inputVector(2)) >= (15.014999) Then
+        If (inputVector(1)) < (2.6743245) Then
+            If (inputVector(4)) < (0.39436936) Then
+                If (inputVector(6)) >= (2#) Then
+                    var30 = -0.0588165596
+                Else
+                    var30 = 0.0323177986
+                End If
+            Else
+                If (inputVector(6)) >= (2#) Then
+                    var30 = -0.0516165905
+                Else
+                    var30 = 0.0845232755
+                End If
+            End If
+        Else
+            If (inputVector(1)) < (5.828431) Then
+                If (inputVector(6)) >= (2#) Then
+                    var30 = -0.0596921444
+                Else
+                    var30 = -0.00488103414
+                End If
+            Else
+                var30 = -0.0591153912
+            End If
+        End If
+    Else
+        If (inputVector(0)) < (0.86664295) Then
+            If (inputVector(2)) >= (8.075) Then
+                If (inputVector(6)) >= (2#) Then
+                    var30 = 0
+                Else
+                    var30 = 0.0625273362
+                End If
+            Else
+                If (inputVector(6)) >= (2#) Then
+                    var30 = -0.0597603694
+                Else
+                    var30 = 0.0709196404
+                End If
+            End If
+        Else
+            If (inputVector(4)) >= (0.67608404) Then
+                If (inputVector(6)) >= (2#) Then
+                    var30 = -0.0605144314
+                Else
+                    var30 = 0.05239686
+                End If
+            Else
+                If (inputVector(6)) >= (2#) Then
+                    var30 = -0.0611895435
+                Else
+                    var30 = 0.0765738338
+                End If
+            End If
+        End If
+    End If
+    Dim var31 As Double
+    If (inputVector(2)) >= (15.014999) Then
+        If (inputVector(1)) < (2.4380116) Then
+            If (inputVector(0)) < (1.4470148) Then
+                If (inputVector(4)) < (0.5988095) Then
+                    var31 = 0.0543138497
+                Else
+                    var31 = 0
+                End If
+            Else
+                If (inputVector(4)) < (0.3986979) Then
+                    var31 = -0.0572394207
+                Else
+                    var31 = 0.0186563917
+                End If
+            End If
+        Else
+            If (inputVector(5)) >= (3#) Then
+                If (inputVector(1)) < (5.828431) Then
+                    var31 = -0.0448209532
+                Else
+                    var31 = -0.0566682778
+                End If
+            Else
+                var31 = 0.0143973697
+            End If
+        End If
+    Else
+        If (inputVector(3)) >= (1.0269403) Then
+            If (inputVector(3)) < (1.0310128) Then
+                If (inputVector(1)) < (1.3166666) Then
+                    var31 = -0.0766356513
+                Else
+                    var31 = 0
+                End If
+            Else
+                If (inputVector(1)) < (3.4479165) Then
+                    var31 = 0.0215043388
+                Else
+                    var31 = -0.0478323512
+                End If
+            End If
+        Else
+            If (inputVector(0)) < (0.8749218) Then
+                If (inputVector(0)) < (0.8539126) Then
+                    var31 = 0.0417226329
+                Else
+                    var31 = -0.0498727411
+                End If
+            Else
+                If (inputVector(4)) < (0.24829473) Then
+                    var31 = 0
+                Else
+                    var31 = 0.0438349247
+                End If
+            End If
+        End If
+    End If
+    Dim var32 As Double
+    var32 = Math.Exp(((((((((((0.5) + (var22)) + (var23)) + (var24)) + (var25)) + (var26)) + (var27)) + (var28)) + (var29)) + (var30)) + (var31))
+    Dim var33 As Double
+    var33 = ((var10) + (var21)) + (var32)
+    Dim var34(2) As Double
+    var34(0) = (var10) / (var33)
+    var34(1) = (var21) / (var33)
+    var34(2) = (var32) / (var33)
+    ScoreD1 = var34
+    
+    '
+    '
+    'End of Python_to_VBA Codes
+    
+    If c = "Critical" Or c = "Serious" Then
+        class0Rng.MergeArea.Cells(1, 1).Value = 1
+        class1Rng.MergeArea.Cells(1, 1).Value = 0
+        class2Rng.MergeArea.Cells(1, 1).Value = 0
+    Else
+        class0Rng.MergeArea.Cells(1, 1).Value = ScoreD1(0)
+        class1Rng.MergeArea.Cells(1, 1).Value = ScoreD1(1)
+        class2Rng.MergeArea.Cells(1, 1).Value = ScoreD1(2)
+    End If
+    
+    
+    'Highlight the cell with the highest prob.
+
+    Dim worstcase As Double ' Long for whole numbers.
+    Dim rng As Range
+    Dim cell As Range
+    With Worksheets("Sheet1")
+        Set rng = .Range("I4:M4")
+        worstcase = Application.WorksheetFunction.Max(rng)
+
+        For Each cell In rng
+            If cell.MergeArea.Cells(1, 1).Value = worstcase Then
+                 cell.MergeArea.Cells(1, 1).Interior.ColorIndex = 3 ' Hightlight cells.
+                  'Exit For ' To highlight only the first found cell.
+            End If
+        Next
+
+    End With
+    
+    
+    'Checking the input values
+    'Range("N2").Value = inputVector(5)
+    'Range("N3").Value = inputVector(6)
+    'Range("N4").Value = inputVector(3)
+    'Range("N5").Value = inputVector(4)
+    'Range("N6").Value = inputVector(0)
+    'Range("N8").Value = inputVector(2)
+    'Range("N9").Value = inputVector(1)
+    'End checking
+   
+    
+End Sub
+
+
+
+
+
+
+
+
+
+
